@@ -1,9 +1,9 @@
 COMPILER  = g++
-CFLAGS    = -g -MMD -MP -Wall -Wextra -Winit-self -Wno-missing-field-initializers
+CFLAGS    = -g -std=gnu++11 -MMD -MP -Wall -Wextra -Winit-self -Wno-missing-field-initializers
 ifeq "$(shell getconf LONG_BIT)" "64"
 	LDFLAGS = -lopencv_core -lopencv_videoio -lopencv_tracking -lopencv_imgcodecs -lopencv_highgui -lopencv_imgproc
 else
-	LDFLAGS =
+	LDFLAGS =  -lopencv_core -lopencv_videoio -lopencv_tracking -lopencv_imgcodecs -lopencv_highgui -lopencv_imgproc
 endif
 LIBS      =
 INCLUDE   = -I./include

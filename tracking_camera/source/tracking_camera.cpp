@@ -51,7 +51,9 @@ static void onMouse( int event, int x, int y, int, void* )
 
 const char* keys =
 {
-    "{help h | | show help message}{@camera_number| 0 | camera number}"
+    "{help h              |     | show help message}"
+    "{@tracking_algorithm | KCF | tracking algorithm    }"
+    "{@camera_number      | 0   | camera number    }"
 };
 
 
@@ -59,10 +61,13 @@ int main( int argc, const char** argv )
 {
     cv::VideoCapture cap;
     cv::Rect2d track_window;
-    CommandLineParser parser(argc, argv, keys);
+    cv::CommandLineParser parser(argc, argv, keys);
+
+    // traking algorithm
+    cv::String tracking_algorithm = parser.get<cv::String>(0);
 
     // camera open
-    auto cam_num = parser.get<int>(0);
+    auto cam_num = parser.get<int>(1);
     cap.open(cam_num);
 
     if(!cap.isOpened())
@@ -74,10 +79,10 @@ int main( int argc, const char** argv )
     }
 
     cv::namedWindow( "OpenCV Tracking API Demo", cv::WINDOW_NORMAL);
-    setMouseCallback( "OpenCV Tracking API Demo", onMouse, 0 );
+    cv::setMouseCallback( "OpenCV Tracking API Demo", onMouse, 0 );
 
     cv::Ptr<cv::Tracker> tracker;
-    auto color_kcf = cv::Scalar(0, 255, 0);
+    auto color_kcf = cv::Scalar(0, 0, 255);
 
     Mat frame;
 
@@ -96,7 +101,7 @@ int main( int argc, const char** argv )
 
             if(trackObject < 0)
             {
-                tracker = cv::Tracker::create("KCF");
+                tracker = cv::Tracker::create(tracking_algorithm);
 
                 track_window = selection;
                 trackObject = 1; // Don't set up again, unless user selects new ROI
@@ -107,7 +112,7 @@ int main( int argc, const char** argv )
             tracker->update(image, selection);
 
             cv::rectangle(image, selection, color_kcf, 1, 1);
-            cv::putText(image, "KCF",cv::Point(5, 20),
+            cv::putText(image, tracking_algorithm, cv::Point(5, 20),
                     cv::FONT_HERSHEY_SIMPLEX, .5, color_kcf, 1, CV_AA);
         }
 
@@ -120,7 +125,7 @@ int main( int argc, const char** argv )
 
         imshow( "OpenCV Tracking API Demo", image );
 
-        auto c = (char)waitKey(10);
+        auto c = (char)waitKey(1);
         if (c == 27)
         {
             break;
